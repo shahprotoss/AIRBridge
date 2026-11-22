@@ -16,7 +16,7 @@ from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parent
-VERSION = "v1.5"
+VERSION = "v1.6"
 SIZE = (1600, 1100)
 
 CONTENT = {
@@ -57,7 +57,7 @@ CONTENT = {
         "requirements": "REQUIREMENTS",
         "requirements_body": "Windows 11 (64-bit) · iPhone with Safari · Same local network",
         "package": "INSIDE THE ZIP",
-        "package_body": "AIRBridge.exe · English & Malay guides · Infographics · Source code",
+        "package_body": "AIRBridge.exe · English guide · Optional Malay guide · No app source",
         "safety": "IMPORTANT",
         "safety_body": "Local HTTP transfers are not encrypted. Use a trusted private network only. This is not native Apple AirDrop.",
         "foot": "OFFICIAL DOWNLOAD · github.com/shahprotoss/AIRBridge/releases/latest",
@@ -100,7 +100,7 @@ CONTENT = {
         "requirements": "KEPERLUAN",
         "requirements_body": "Windows 11 (64-bit) · iPhone dengan Safari · Rangkaian yang sama",
         "package": "KANDUNGAN ZIP",
-        "package_body": "AIRBridge.exe · Panduan English & BM · Infografik · Kod sumber",
+        "package_body": "AIRBridge.exe · Panduan English · Pilihan BM · Tanpa kod sumber",
         "safety": "PENTING",
         "safety_body": "Pemindahan HTTP setempat tidak disulitkan. Guna rangkaian peribadi dipercayai. Bukan AirDrop rasmi Apple.",
         "foot": "MUAT TURUN RASMI · github.com/shahprotoss/AIRBridge/releases/latest",

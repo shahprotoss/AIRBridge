@@ -15,7 +15,7 @@ AirDrop rasmi Apple**.
 
 1. **Muat turun AIRBridge** melalui
    [GitHub Releases](https://github.com/shahprotoss/AIRBridge/releases/latest).
-   Pilih **AIRBridge-v1.5-Pakej-Lengkap.zip**, klik kanan dan **Extract All**.
+   Pilih **AIRBridge-v1.6-Windows.zip**, klik kanan dan **Extract All**.
    Fail **AIRBridge.exe** juga boleh dimuat turun secara berasingan.
 2. **Buka AIRBridge.exe** pada Windows. Jika Windows Firewall bertanya,
    benarkan rangkaian **Private** sahaja.
@@ -35,6 +35,8 @@ AirDrop rasmi Apple**.
 - Secara lalai, pemasangan baharu menyimpan fail dalam **Downloads\\AIRBridge**.
 - Gunakan butang **Tukar** untuk memilih folder lain. Folder lama pengguna
   DropBridge akan dikekalkan secara automatik selepas naik taraf.
+- Bahasa English dipaparkan secara lalai untuk pengguna baharu. Bahasa
+  Melayu boleh dipilih melalui suis bahasa pada aplikasi Windows atau Safari.
 - Bahasa Windows dan Safari diingati secara berasingan. Sambungan Safari
   pertama mengikuti bahasa Windows jika iPhone belum mempunyai pilihan.
 

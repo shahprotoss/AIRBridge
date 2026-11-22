@@ -1,0 +1,49 @@
+AIRBridge v1.6 — QUICK START (ENGLISH)
+====================================
+
+AIRBridge transfers photos, videos and documents from iPhone to Windows
+on the same trusted local network. It is not Apple's native AirDrop.
+
+GET STARTED
+-----------
+1. Extract AIRBridge-v1.6-Windows.zip (right click > Extract All).
+2. Open AIRBridge.exe on your Windows 11 computer.
+3. If Windows Firewall prompts you, allow access on PRIVATE networks only.
+4. Connect your iPhone and Windows PC to the same local network.
+   The PC can use Ethernet; the iPhone uses Wi-Fi.
+5. Scan the live QR code shown in AIRBridge using your iPhone Camera.
+6. Open the link in Safari. Select photos, videos or documents.
+7. Tap "Send to Windows", then click "Accept" in the Windows app.
+8. Wait for the transfer-complete notification. Click "Open received files"
+   to see the files you received.
+
+LANGUAGE
+--------
+English is the default language on a new installation and in Safari.
+Bahasa Melayu is available using the English / Bahasa Melayu switch.
+Windows and Safari remember a language that you explicitly selected.
+When iPhone Safari has no stored preference, the language selected
+in the Windows app is offered through the QR link.
+
+PACKAGE CONTENTS
+----------------
+AIRBridge.exe                         Windows application
+START_HERE.txt                        This English quick-start guide
+GUIDE_EN.md                            Detailed English user guide
+AIRBridge-Guide-EN.png                 Illustrated English guide
+Optional-Bahasa-Melayu/GUIDE_BM.md     Panduan Bahasa Melayu
+Optional-Bahasa-Melayu/Guide-BM.png    Infografik Bahasa Melayu
+
+IMPORTANT
+---------
+- No application-defined limit on file count or total file size.
+  Practical device, browser, storage and network limits still apply.
+- Safari must remain active during the transfer.
+- Transfers use plain HTTP on your local network and are NOT encrypted.
+  Only use a trusted PRIVATE network. Never forward AIRBridge to the internet.
+- The executable is not digitally signed; Windows may show a warning.
+- This is not native Apple AirDrop and is not affiliated with Apple.
+
+GET UPDATES
+-----------
+https://github.com/shahprotoss/AIRBridge/releases/latest

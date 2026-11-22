@@ -50,12 +50,15 @@ jobs:
       - name: Create ZIP for users
         run: python package_airbridge.py
 
+      - name: Verify English-first ZIP contains no source files
+        run: python -m unittest -v test_distribution
+
       - name: Upload ZIP and executable to build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: AIRBridge-Windows
           path: |
-            AIRBridge-v*-Pakej-Lengkap.zip
+            AIRBridge-v*-Windows.zip
             dist/AIRBridge.exe
             INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png
             AIRBridge-Guide-EN.png
@@ -67,7 +70,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: |
-          $package = (Get-ChildItem -File -Filter "AIRBridge-v*-Pakej-Lengkap.zip" |
+          $package = (Get-ChildItem -File -Filter "AIRBridge-v*-Windows.zip" |
             Select-Object -First 1).FullName
           if (-not $package) { throw "AIRBridge ZIP was not generated" }
           gh release create "$env:GITHUB_REF_NAME" `

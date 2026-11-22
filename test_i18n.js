@@ -57,7 +57,9 @@ reopened.i18n.setLanguage("en");
 assert.equal(reopened.i18n.t("upload_title"), "Send to Windows");
 
 const defaultMalay = launch("http://192.168.0.10:55000/?k=token", "", "ms-MY");
-assert.equal(defaultMalay.i18n.getLanguage(), "ms");
+assert.equal(defaultMalay.i18n.getLanguage(), "en", "New Safari users see English even on Malay-locale devices");
+const desktopMalayHint = launch("http://192.168.0.10:55000/?k=token&lang=ms");
+assert.equal(desktopMalayHint.i18n.getLanguage(), "ms", "Malay remains available through the QR pairing language hint");
 const translations = english.i18n.translations;
 assert.deepEqual(
   Object.keys(translations.en).sort(),

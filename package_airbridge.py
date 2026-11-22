@@ -1,4 +1,4 @@
-"""Build one user-friendly ZIP with a single AIRBridge/ root directory."""
+"""Build a user-only Windows ZIP. Never include application source files."""
 from __future__ import annotations
 
 import hashlib
@@ -12,26 +12,19 @@ EXE = BASE / "dist" / "AIRBridge.exe"
 INFOGRAPHIC = BASE / "INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png"
 GUIDE = BASE / "PANDUAN-INFOGRAFIK.html"
 START = BASE / "MULA-DI-SINI.txt"
-VERSION = "v1.5"
-ZIP_NAME = f"AIRBridge-{VERSION}-Pakej-Lengkap.zip"
+VERSION = "v1.6"
+ZIP_NAME = f"AIRBridge-{VERSION}-Windows.zip"
 SHARE_DIRS = [
     Path.home() / "Desktop",
     Path.home() / "Downloads",
 ]
-SOURCES = (
-    "app.py",
-    "localization.py",
-    "transfer_server.py",
-    "make_icon.py",
-    "README.md",
-    "requirements.txt",
-    "build.bat",
-    "start.bat",
-    "test_transfer.py",
-    "test_ui.py",
-    "test_i18n.js",
-    "test_localization.py",
-    "create_visual_guides.py",
+PACKAGE_FILES = (
+    (EXE, "AIRBridge/AIRBridge.exe"),
+    (BASE / "START_HERE.txt", "AIRBridge/START_HERE.txt"),
+    (BASE / "GUIDE_EN.md", "AIRBridge/GUIDE_EN.md"),
+    (BASE / "AIRBridge-Guide-EN.png", "AIRBridge/AIRBridge-Guide-EN.png"),
+    (BASE / "GUIDE_BM.md", "AIRBridge/Optional-Bahasa-Melayu/GUIDE_BM.md"),
+    (BASE / "AIRBridge-Guide-BM.png", "AIRBridge/Optional-Bahasa-Melayu/Guide-BM.png"),
 )
 
 
@@ -44,38 +37,14 @@ def sha256(path: Path) -> str:
 
 
 def main() -> None:
-    for p in (
-        EXE, INFOGRAPHIC, GUIDE, START,
-        BASE / "AIRBridge-Guide-EN.png", BASE / "AIRBridge-Guide-BM.png",
-        BASE / "AIRBridge-Guide-EN.html", BASE / "AIRBridge-Guide-BM.html",
-        BASE / "GUIDE_EN.md", BASE / "GUIDE_BM.md",
-    ):
+    for p, _ in PACKAGE_FILES:
         if not p.is_file() or p.stat().st_size == 0:
             raise FileNotFoundError(f"Required package file is missing: {p}")
 
     # Build in the project folder first, so an interrupted copy cannot leave
     # an incomplete ZIP on Desktop or Downloads.
     destination = BASE / ZIP_NAME
-    entries: list[tuple[Path, str]] = [
-        (EXE, "AIRBridge/AIRBridge.exe"),
-        (INFOGRAPHIC, "AIRBridge/INFOGRAFIK-CARA-GUNA.png"),
-        (BASE / "AIRBridge-Guide-EN.png", "AIRBridge/AIRBridge-Guide-EN.png"),
-        (BASE / "AIRBridge-Guide-BM.png", "AIRBridge/AIRBridge-Guide-BM.png"),
-        (BASE / "AIRBridge-Guide-EN.html", "AIRBridge/AIRBridge-Guide-EN.html"),
-        (BASE / "AIRBridge-Guide-BM.html", "AIRBridge/AIRBridge-Guide-BM.html"),
-        (BASE / "GUIDE_EN.md", "AIRBridge/GUIDE_EN.md"),
-        (BASE / "GUIDE_BM.md", "AIRBridge/GUIDE_BM.md"),
-        (GUIDE, "AIRBridge/PANDUAN-INFOGRAFIK.html"),
-        (START, "AIRBridge/MULA-DI-SINI.txt"),
-    ]
-    for relative in SOURCES:
-        entries.append((BASE / relative, "AIRBridge/Kod-Sumber/" + relative))
-    for folder_name in ("assets", "web"):
-        for path in (BASE / folder_name).rglob("*"):
-            if path.is_file():
-                entries.append((
-                    path, "AIRBridge/Kod-Sumber/" + path.relative_to(BASE).as_posix()
-                ))
+    entries = PACKAGE_FILES
 
     with zipfile.ZipFile(
         destination, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6,
@@ -90,9 +59,11 @@ def main() -> None:
         members = archive.namelist()
         assert all(x.startswith("AIRBridge/") for x in members)
         assert len(members) == len(set(members))
-        assert len(members) >= 12
+        assert len(members) == len(PACKAGE_FILES)
         assert archive.getinfo("AIRBridge/AIRBridge.exe").file_size == EXE.stat().st_size
-        assert archive.getinfo("AIRBridge/INFOGRAFIK-CARA-GUNA.png").file_size == INFOGRAPHIC.stat().st_size
+        assert set(members) == {name for _, name in PACKAGE_FILES}
+        assert all(not name.lower().endswith((".py", ".js", ".bat", ".html", ".spec", ".pyc")) for name in members)
+        assert all("source" not in name.lower() and "kod-sumber" not in name.lower() for name in members)
 
     for directory in SHARE_DIRS:
         if directory.is_dir():

@@ -83,7 +83,9 @@
   const queryLanguage = new URL(location.href).searchParams.get("lang");
   const requested = readCookie() || (["en", "ms"].includes(queryLanguage)
     ? queryLanguage : null);
-  let language = requested || (navigator.language.toLowerCase().startsWith("ms") ? "ms" : "en");
+  // English is the product default. Malay is selected explicitly or via
+  // the desktop pairing hint, and an existing saved iPhone choice wins.
+  let language = requested || "en";
 
   function t(key, values = {}) {
     const raw = translations[language][key];

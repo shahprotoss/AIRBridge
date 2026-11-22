@@ -1,4 +1,4 @@
-AIRBridge v1.5 — PANDUAN RINGKAS (iPhone ke Windows)
+AIRBridge v1.6 — PANDUAN PILIHAN BAHASA MELAYU (iPhone ke Windows)
 ====================================================
 
 AIRBridge ialah aplikasi Windows untuk menerima foto, video dan dokumen
@@ -42,7 +42,7 @@ GUIDE_EN.md                   Step-by-step English user guide
 GUIDE_BM.md                   Panduan lengkap Bahasa Melayu
 PANDUAN-INFOGRAFIK.html       Panduan bergambar yang boleh dibuka di pelayar
 MULA-DI-SINI.txt              Panduan ringkas ini
-Kod-Sumber/                   Kod sumber, arahan binaan dan fail ujian (pilihan)
+START_HERE.txt                Panduan utama dalam English
 
 NOTA PENTING
 ------------
@@ -56,7 +56,7 @@ NOTA PENTING
   rangkaian tetamu (guest Wi-Fi) atau pengasingan peranti (client isolation).
 - Notifikasi dalam aplikasi dipaparkan apabila selesai; notifikasi Windows
   bergantung pada tetapan Focus Assist/Notifications.
-- Aplikasi belum ditandatangani secara digital. Semak sumber fail sebelum
+- Aplikasi belum ditandatangani secara digital. Semak asal fail sebelum
   membenarkan sebarang amaran keselamatan daripada Windows.
 - Folder fail diterima yang sedia ada tidak dipadam atau dipindahkan apabila
   menaik taraf daripada DropBridge.

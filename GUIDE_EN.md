@@ -16,8 +16,9 @@ alternative, **not** Apple's native AirDrop protocol.
 
 1. **Download AIRBridge** from the
    [latest GitHub Release](https://github.com/shahprotoss/AIRBridge/releases/latest).
-   Download **AIRBridge-v1.5-Pakej-Lengkap.zip** and choose **Extract All**.
-   You can also download **AIRBridge.exe** on its own.
+   Download **AIRBridge-v1.6-Windows.zip** and choose **Extract All**.
+   You can also download **AIRBridge.exe** on its own. The ZIP contains
+   application files and guides, not raw source code.
 2. **Open AIRBridge.exe** on your Windows PC. If Windows Firewall asks,
    allow it for **Private networks only**. Keep AIRBridge open while receiving.
 3. **Choose your language:** select **English** or **Bahasa Melayu** at the
@@ -44,7 +45,8 @@ directory is preserved automatically.
 
 - **Windows:** Select **English / Bahasa Melayu** in the top bar; the
   preference is saved to the PC settings.
-- **iPhone:** Select **English / Bahasa Melayu** on the Safari sender page;
+- **iPhone:** English is the default even when the phone's system language is
+  Malay. Select **English / Bahasa Melayu** on the Safari sender page;
   its preference is remembered independently on the iPhone.
 - The first Safari visit follows the Windows language when the iPhone has
   no previously selected language.
