@@ -12,7 +12,7 @@ EXE = BASE / "dist" / "AIRBridge.exe"
 INFOGRAPHIC = BASE / "INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png"
 GUIDE = BASE / "PANDUAN-INFOGRAFIK.html"
 START = BASE / "MULA-DI-SINI.txt"
-VERSION = "v1.3"
+VERSION = "v1.4"
 ZIP_NAME = f"AIRBridge-{VERSION}-Pakej-Lengkap.zip"
 SHARE_DIRS = [
     Path.home() / "Desktop",
@@ -20,6 +20,7 @@ SHARE_DIRS = [
 ]
 SOURCES = (
     "app.py",
+    "localization.py",
     "transfer_server.py",
     "make_icon.py",
     "README.md",
@@ -28,6 +29,8 @@ SOURCES = (
     "start.bat",
     "test_transfer.py",
     "test_ui.py",
+    "test_i18n.js",
+    "test_localization.py",
 )
 
 

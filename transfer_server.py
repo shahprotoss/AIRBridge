@@ -123,7 +123,7 @@ class DropServer:
         receiver = self
 
         class Handler(BaseHTTPRequestHandler):
-            server_version = "AIRBridge/1.3"
+            server_version = "AIRBridge/1.4"
             protocol_version = "HTTP/1.1"
 
             def log_message(self, *_args):
@@ -186,7 +186,7 @@ class DropServer:
                     if not secrets.compare_digest(access, receiver.token):
                         return self._fail(403, "Scan the QR code displayed on your PC")
                     return self._send(200, (WEB_DIR / "index.html").read_bytes(), "text/html; charset=utf-8")
-                if route.path in ("/style.css", "/client.js"):
+                if route.path in ("/style.css", "/client.js", "/i18n.js"):
                     name = route.path[1:]
                     mime = "text/css; charset=utf-8" if name.endswith(".css") else "text/javascript; charset=utf-8"
                     return self._send(200, (WEB_DIR / name).read_bytes(), mime)
@@ -398,8 +398,11 @@ class DropServer:
             self.events.put(("decision", offer.id, offer.state))
             return True
 
-    def url(self) -> str:
-        return f"http://{local_ipv4()}:{self.port}/?k={self.token}"
+    def url(self, language: str | None = None) -> str:
+        link = f"http://{local_ipv4()}:{self.port}/?k={self.token}"
+        if language in ("en", "ms"):
+            link += f"&lang={language}"
+        return link
 
     def stop(self):
         if self.httpd is not None:

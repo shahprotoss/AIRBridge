@@ -21,6 +21,7 @@ import qrcode
 from PIL import Image
 
 from transfer_server import DropServer, local_ipv4
+from localization import LANGUAGES, translate
 
 
 RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
@@ -102,7 +103,11 @@ class AIRBridgeApp(ctk.CTk):
     def __init__(self):
         ctk.set_appearance_mode("light")
         super().__init__()
-        self.title("AIRBridge  •  iPhone to Windows")
+        settings = load_config()
+        self.language = settings.get("language", "en")
+        if self.language not in LANGUAGES:
+            self.language = "en"
+        self.title(self.t("window_title"))
         self.geometry("1100x750")
         self.minsize(920, 660)
         self.configure(fg_color=BG)
@@ -112,12 +117,12 @@ class AIRBridgeApp(ctk.CTk):
         except (OSError, tk.TclError):
             pass
 
-        self.save_dir = Path(load_config().get("save_dir") or DEFAULT_SAVE)
+        self.save_dir = Path(settings.get("save_dir") or DEFAULT_SAVE)
         self.receiver = DropServer(self.save_dir).start()
         self.pending_signature: tuple[str, ...] = ()
         self.history_signature: tuple[tuple[str, float], ...] = ()
         self.notified: set[str] = set()
-        self.status_var = tk.StringVar(value="Ready for your next transfer")
+        self.status_var = tk.StringVar(value=self.t("status_ready"))
         self.folder_var = tk.StringVar(value=str(self.save_dir))
         self.ip_var = tk.StringVar(value="Connecting…")
         self.address_var = tk.StringVar()
@@ -128,7 +133,28 @@ class AIRBridgeApp(ctk.CTk):
 
         self._build()
         self._refresh_qr()
-        self.after(250, self._poll)
+        self._poll_after_id = self.after(250, self._poll)
+
+    def t(self, key: str, **values) -> str:
+        return translate(self.language, key, **values)
+
+    def _set_language(self, display_name: str):
+        selected = "ms" if display_name == "Bahasa Melayu" else "en"
+        if selected == self.language:
+            return
+        self.language = selected
+        save_config({"save_dir": str(self.save_dir), "language": self.language})
+        self.title(self.t("window_title"))
+        self.status_var.set(self.t("status_ready"))
+        for widget in list(self.winfo_children()):
+            widget.destroy()
+        self.pending_signature = ()
+        self.history_signature = ()
+        self._build()
+        self._refresh_qr()
+        self._display_pending()
+        self._display_history()
+        self._display_progress()
 
     def _build(self):
         self.grid_columnconfigure(0, weight=1)
@@ -152,14 +178,25 @@ class AIRBridgeApp(ctk.CTk):
         txt(header, "AIRBridge", 23, INK, "bold").grid(
             row=0, column=1, sticky="sw"
         )
-        txt(header, "SEAMLESS LOCAL TRANSFER", 10, MUTED).grid(
+        txt(header, self.t("tagline"), 10, MUTED).grid(
             row=1, column=1, sticky="nw", pady=(1, 0)
         )
+        self.language_picker = ctk.CTkSegmentedButton(
+            header, values=["English", "Bahasa Melayu"],
+            command=self._set_language, width=195, height=36,
+            corner_radius=14, fg_color="#EDF1F7",
+            selected_color=BLUE, selected_hover_color=BLUE_HOVER,
+            unselected_color="#EDF1F7", unselected_hover_color="#E0E7F1",
+            text_color=INK, text_color_disabled=MUTED,
+            font=ctk.CTkFont(family=FONT, size=11, weight="bold"),
+        )
+        self.language_picker.grid(row=0, column=2, rowspan=2, sticky="e", padx=(8, 12))
+        self.language_picker.set("Bahasa Melayu" if self.language == "ms" else "English")
         online = ctk.CTkFrame(header, fg_color=PALE_GREEN, corner_radius=22)
-        online.grid(row=0, column=2, rowspan=2, sticky="e", padx=(10, 12))
-        txt(online, "●  Available", 11, GREEN, "bold").pack(padx=17, pady=10)
-        pill(header, "Open received files  ↗", lambda: open_folder(self.save_dir),
-             width=172).grid(row=0, column=3, rowspan=2, sticky="e")
+        online.grid(row=0, column=3, rowspan=2, sticky="e", padx=(0, 12))
+        txt(online, self.t("available"), 11, GREEN, "bold").pack(padx=14, pady=10)
+        pill(header, self.t("open_received"), lambda: open_folder(self.save_dir),
+             width=175).grid(row=0, column=4, rowspan=2, sticky="e")
 
         body = ctk.CTkFrame(self, fg_color="transparent")
         body.grid(row=1, column=0, sticky="nsew", padx=34, pady=(2, 16))
@@ -174,12 +211,12 @@ class AIRBridgeApp(ctk.CTk):
         )
         left.grid(row=0, column=0, sticky="nsew", padx=(0, 18))
         left.grid_propagate(False)
-        txt(left, "01  ·  CONNECT YOUR DEVICE", 10, BLUE, "bold").pack(
+        txt(left, self.t("connect_heading"), 10, BLUE, "bold").pack(
             anchor="w", padx=28, pady=(30, 10)
         )
-        txt(left, "Your iPhone,\nmeet Windows.", 25, INK, "bold",
+        txt(left, self.t("connect_title"), 25, INK, "bold",
             justify="left").pack(anchor="w", padx=28)
-        txt(left, "Open Camera on your iPhone\nand scan the code below.",
+        txt(left, self.t("connect_hint"),
             12, MUTED, justify="left").pack(anchor="w", padx=28, pady=(9, 13))
 
         qr_wrap = ctk.CTkFrame(
@@ -194,17 +231,17 @@ class AIRBridgeApp(ctk.CTk):
         network = ctk.CTkFrame(left, fg_color=CARD_BG, corner_radius=14)
         network.pack(fill="x", padx=25, pady=(3, 12))
         txt(network, "●", 13, GREEN).pack(side="left", padx=(14, 6), pady=11)
-        txt(network, "Private network", 11, INK, "bold").pack(
+        txt(network, self.t("private_network"), 11, INK, "bold").pack(
             side="left", pady=11
         )
         txt(network, "", 11, MUTED, textvariable=self.ip_var).pack(
             side="right", padx=(5, 14), pady=11
         )
         self.copy_button = pill(
-            left, "Copy pairing link    ↗", self._copy_url, primary=True, height=44
+            left, self.t("copy_link"), self._copy_url, primary=True, height=44
         )
         self.copy_button.pack(fill="x", padx=25, pady=(0, 7))
-        txt(left, "Private by design. Every transfer needs approval.",
+        txt(left, self.t("privacy"),
             10, MUTED, wraplength=285).pack(anchor="w", padx=27, pady=(7, 18))
 
         # Right side is scrollable so the interface remains useful on small screens.
@@ -231,9 +268,9 @@ class AIRBridgeApp(ctk.CTk):
         self.hero_icon.pack(side="left", padx=(0, 14))
         title_wrap = ctk.CTkFrame(state_top, fg_color="transparent")
         title_wrap.pack(side="left", fill="x", expand=True)
-        self.hero_title = txt(title_wrap, "Ready to receive", 20, INK, "bold")
+        self.hero_title = txt(title_wrap, self.t("ready_title"), 20, INK, "bold")
         self.hero_title.pack(anchor="w")
-        self.hero_caption = txt(title_wrap, "Waiting for your iPhone to connect",
+        self.hero_caption = txt(title_wrap, self.t("ready_caption"),
                                 11, MUTED)
         self.hero_caption.pack(anchor="w", pady=(3, 0))
         self.main_progress = ctk.CTkProgressBar(
@@ -242,7 +279,7 @@ class AIRBridgeApp(ctk.CTk):
         )
         self.main_progress.set(0)
         self.main_progress.pack(fill="x", padx=25, pady=(15, 7))
-        self.hero_progress = txt(status_card, "Your next transfer starts here",
+        self.hero_progress = txt(status_card, self.t("ready_progress"),
                                  11, MUTED)
         self.hero_progress.pack(anchor="w", padx=25, pady=(0, 19))
 
@@ -254,8 +291,8 @@ class AIRBridgeApp(ctk.CTk):
         dest.pack(fill="x", padx=(0, 2), pady=(0, 13))
         dest_header = ctk.CTkFrame(dest, fg_color="transparent")
         dest_header.pack(fill="x", padx=21, pady=(15, 4))
-        txt(dest_header, "SAVE LOCATION", 10, MUTED, "bold").pack(side="left")
-        pill(dest_header, "Change", self._choose_folder,
+        txt(dest_header, self.t("save_location"), 10, MUTED, "bold").pack(side="left")
+        pill(dest_header, self.t("change"), self._choose_folder,
              width=76, height=30, corner_radius=12).pack(side="right")
         txt(dest, "▣  " + str(self.save_dir), 11, INK,
             textvariable=self.folder_var, wraplength=515, justify="left").pack(
@@ -270,14 +307,14 @@ class AIRBridgeApp(ctk.CTk):
         pending.pack(fill="x", padx=(0, 2), pady=(0, 13))
         pending_header = ctk.CTkFrame(pending, fg_color="transparent")
         pending_header.pack(fill="x", padx=22, pady=(17, 8))
-        txt(pending_header, "Incoming requests", 16, INK, "bold").pack(side="left")
-        self.request_count = txt(pending_header, "0 pending", 10, MUTED)
+        txt(pending_header, self.t("incoming"), 16, INK, "bold").pack(side="left")
+        self.request_count = txt(pending_header, self.t("pending_count", count=0), 10, MUTED)
         self.request_count.pack(side="right", pady=3)
         self.pending_box = ctk.CTkFrame(
             pending, fg_color=CARD_BG, corner_radius=14,
         )
         self.pending_box.pack(fill="x", padx=19, pady=(0, 19))
-        txt(self.pending_box, "Nothing incoming yet. Scan the QR code to begin.",
+        txt(self.pending_box, self.t("empty_pending"),
             11, MUTED, wraplength=425).pack(
             anchor="w", padx=16, pady=18
         )
@@ -290,14 +327,14 @@ class AIRBridgeApp(ctk.CTk):
         history.pack(fill="both", expand=True, padx=(0, 2), pady=(0, 3))
         history_header = ctk.CTkFrame(history, fg_color="transparent")
         history_header.pack(fill="x", padx=22, pady=(18, 9))
-        txt(history_header, "Recent activity", 16, INK, "bold").pack(side="left")
-        self.activity_count = txt(history_header, "0 files", 10, MUTED)
+        txt(history_header, self.t("recent"), 16, INK, "bold").pack(side="left")
+        self.activity_count = txt(history_header, self.t("recent_initial"), 10, MUTED)
         self.activity_count.pack(side="right", pady=3)
         self.history_box = ctk.CTkFrame(
             history, fg_color="transparent", corner_radius=0,
         )
         self.history_box.pack(fill="x", padx=20, pady=(0, 14))
-        txt(self.history_box, "Files you receive will appear here.", 11, MUTED).pack(
+        txt(self.history_box, self.t("empty_history"), 11, MUTED).pack(
             anchor="w", pady=10
         )
 
@@ -307,13 +344,13 @@ class AIRBridgeApp(ctk.CTk):
         txt(footer, "", 11, MUTED, textvariable=self.status_var).pack(
             side="left", padx=(7, 0)
         )
-        txt(footer, "Local network only    •    Not affiliated with Apple",
+        txt(footer, self.t("footer"),
             10, SUBTLE).pack(side="right")
 
     def _refresh_qr(self):
-        uri = self.receiver.url()
+        uri = self.receiver.url(self.language)
         ip = local_ipv4()
-        self.ip_var.set(ip if ip != "127.0.0.1" else "No LAN connection")
+        self.ip_var.set(ip if ip != "127.0.0.1" else self.t("no_lan"))
         self.address_var.set(uri)
         qr = qrcode.QRCode(
             box_size=8, border=2,
@@ -331,10 +368,14 @@ class AIRBridgeApp(ctk.CTk):
 
     def _copy_url(self):
         self.clipboard_clear()
-        self.clipboard_append(self.receiver.url())
-        self.status_var.set("Pairing link copied to clipboard")
-        self.copy_button.configure(text="Copied ✓")
-        self.after(2000, lambda: self.copy_button.configure(text="Copy pairing link    ↗"))
+        self.clipboard_append(self.receiver.url(self.language))
+        self.status_var.set(self.t("status_copied"))
+        self.copy_button.configure(text=self.t("copied"))
+        self.after(2000, self._restore_copy_button)
+
+    def _restore_copy_button(self):
+        if self.copy_button.winfo_exists():
+            self.copy_button.configure(text=self.t("copy_link"))
 
     def _choose_folder(self):
         directory = filedialog.askdirectory(initialdir=str(self.save_dir))
@@ -342,8 +383,8 @@ class AIRBridgeApp(ctk.CTk):
             self.save_dir = Path(directory)
             self.receiver.save_dir = self.save_dir
             self.folder_var.set(str(self.save_dir))
-            save_config({"save_dir": str(self.save_dir)})
-            self.status_var.set("Save location updated")
+            save_config({"save_dir": str(self.save_dir), "language": self.language})
+            self.status_var.set(self.t("status_folder"))
 
     def _poll(self):
         try:
@@ -366,7 +407,7 @@ class AIRBridgeApp(ctk.CTk):
         self._display_pending()
         self._display_history()
         self._display_progress()
-        self.after(450, self._poll)
+        self._poll_after_id = self.after(450, self._poll)
 
     def _display_pending(self):
         pending = self.receiver.pending()
@@ -374,18 +415,20 @@ class AIRBridgeApp(ctk.CTk):
         if signature == self.pending_signature:
             return
         self.pending_signature = signature
-        self.request_count.configure(text=str(len(pending)) + " pending")
+        self.request_count.configure(
+            text=self.t("pending_count", count=len(pending))
+        )
         for child in self.pending_box.winfo_children():
             child.destroy()
         if not pending:
-            txt(self.pending_box, "Nothing incoming yet. Scan the QR code to begin.",
+            txt(self.pending_box, self.t("empty_pending"),
                 11, MUTED, wraplength=420).pack(
                 anchor="w", padx=16, pady=18
             )
             return
         offer = pending[0]
         txt(self.pending_box,
-            f"{offer.label} wants to send {len(offer.files)} file(s)",
+            self.t("offer_title", device=offer.label, count=len(offer.files)),
             13, INK, "bold").pack(anchor="w", padx=16, pady=(16, 5))
         preview = ", ".join(item["name"] for item in offer.files[:3])
         if len(offer.files) > 3:
@@ -396,18 +439,20 @@ class AIRBridgeApp(ctk.CTk):
         )
         actions = ctk.CTkFrame(self.pending_box, fg_color="transparent")
         actions.pack(anchor="w", padx=16, pady=(0, 15))
-        pill(actions, "Accept", lambda oid=offer.id: self._decide(oid, True),
+        pill(actions, self.t("accept"), lambda oid=offer.id: self._decide(oid, True),
              primary=True, width=108, height=35).pack(side="left", padx=(0, 9))
-        pill(actions, "Decline", lambda oid=offer.id: self._decide(oid, False),
+        pill(actions, self.t("decline"), lambda oid=offer.id: self._decide(oid, False),
              width=99, height=35).pack(side="left")
         if len(pending) > 1:
-            txt(self.pending_box, f"+{len(pending) - 1} more requests",
+            txt(self.pending_box, self.t("more_requests", count=len(pending) - 1),
                 10, MUTED).pack(anchor="w", padx=16, pady=(0, 12))
-        self.status_var.set("New transfer request from " + offer.label)
+        self.status_var.set(self.t("status_request", device=offer.label))
 
     def _decide(self, offer_id: str, accepted: bool):
         if self.receiver.approve(offer_id, accepted):
-            self.status_var.set("Transfer approved" if accepted else "Transfer declined")
+            self.status_var.set(
+                self.t("status_accepted" if accepted else "status_declined")
+            )
             self._display_pending()
 
     def _display_history(self):
@@ -417,11 +462,13 @@ class AIRBridgeApp(ctk.CTk):
         if signature == self.history_signature:
             return
         self.history_signature = signature
-        self.activity_count.configure(text=f"{len(records)} recent file(s)")
+        self.activity_count.configure(
+            text=self.t("recent_count", count=len(records))
+        )
         for child in self.history_box.winfo_children():
             child.destroy()
         if not records:
-            txt(self.history_box, "Files you receive will appear here.",
+            txt(self.history_box, self.t("empty_history"),
                 11, MUTED).pack(anchor="w", pady=10)
             return
         for entry in records:
@@ -455,24 +502,29 @@ class AIRBridgeApp(ctk.CTk):
         done = sum(item.bytes_received for item in active)
         progress = done / total if total > 0 else 0.0
         self.main_progress.set(min(1.0, max(0.0, progress)))
-        self.hero_title.configure(text="Receiving files…")
+        self.hero_title.configure(text=self.t("receiving_title"))
         self.hero_caption.configure(
-            text=f"{len(active)} transfer(s) in progress"
+            text=self.t("receiving_caption", count=len(active))
         )
         self.hero_progress.configure(
-            text=format_bytes(done) + " of " + format_bytes(total) + " received"
+            text=self.t(
+                "receiving_progress", done=format_bytes(done),
+                total=format_bytes(total),
+            )
         )
 
     def _on_complete(self, offer):
         count = len(offer.files)
-        detail = f"{count} file{'s' if count != 1 else ''} · {format_bytes(offer.total)} saved"
+        detail = self.t(
+            "complete_detail", count=count, size=format_bytes(offer.total)
+        )
         self.main_progress.set(1)
         self.hero_icon.configure(text="✓", fg_color=GREEN)
-        self.hero_title.configure(text="Transfer complete!")
-        self.hero_caption.configure(text="Everything arrived safely on your PC")
+        self.hero_title.configure(text=self.t("complete_title"))
+        self.hero_caption.configure(text=self.t("complete_caption"))
         self.hero_progress.configure(text=detail)
-        self.status_var.set(f"Successfully received {count} file(s)")
-        self._show_toast("Transfer complete", detail)
+        self.status_var.set(self.t("success_status", count=count))
+        self._show_toast(self.t("complete_title"), detail)
         threading.Thread(
             target=self._native_toast, args=(count, offer.total),
             daemon=True,
@@ -487,10 +539,10 @@ class AIRBridgeApp(ctk.CTk):
             return
         self.main_progress.set(0)
         self.hero_icon.configure(text="✓", fg_color=BLUE)
-        self.hero_title.configure(text="Ready to receive")
-        self.hero_caption.configure(text="Waiting for your iPhone to connect")
-        self.hero_progress.configure(text="Your next transfer starts here")
-        self.status_var.set("Ready for your next transfer")
+        self.hero_title.configure(text=self.t("ready_title"))
+        self.hero_caption.configure(text=self.t("ready_caption"))
+        self.hero_progress.configure(text=self.t("ready_progress"))
+        self.status_var.set(self.t("status_ready"))
 
     def _show_toast(self, title: str, detail: str):
         """Reliable local popup even when system notifications are disabled."""
@@ -526,15 +578,16 @@ class AIRBridgeApp(ctk.CTk):
             justify="left").pack(anchor="w", pady=(4, 0))
         toast.after(5500, lambda: toast.destroy() if toast.winfo_exists() else None)
 
-    @staticmethod
-    def _native_toast(count: int, total: int):
+    def _native_toast(self, count: int, total: int):
         """Show the native Windows notification when permitted by the OS."""
         try:
             from winotify import Notification
             native = Notification(
                 app_id="AIRBridge",
-                title="AIRBridge · Transfer complete",
-                msg=f"{count} file(s) received ({format_bytes(total)})",
+                title=self.t("native_title"),
+                msg=self.t(
+                    "native_message", count=count, size=format_bytes(total)
+                ),
                 icon=str(LOGO_PATH) if LOGO_PATH.exists() else "",
                 duration="short",
             )
@@ -545,6 +598,18 @@ class AIRBridgeApp(ctk.CTk):
             pass
 
     def close(self):
+        if getattr(self, "_poll_after_id", None) is not None:
+            self.after_cancel(self._poll_after_id)
+            self._poll_after_id = None
+        if self._status_reset_id is not None:
+            self.after_cancel(self._status_reset_id)
+            self._status_reset_id = None
+        if self.toast_window is not None:
+            try:
+                if self.toast_window.winfo_exists():
+                    self.toast_window.destroy()
+            except tk.TclError:
+                pass
         self.receiver.stop()
         self.destroy()
 
@@ -555,7 +620,7 @@ def main():
     except OSError as exc:
         root = tk.Tk()
         root.withdraw()
-        messagebox.showerror("AIRBridge", "Unable to start receiver: " + str(exc))
+        messagebox.showerror("AIRBridge", translate("en", "launch_error", error=exc))
 
 
 if __name__ == "__main__":

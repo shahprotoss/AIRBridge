@@ -15,7 +15,38 @@
   const progress = document.getElementById("progress");
   const bar = document.getElementById("bar");
   const speed = document.getElementById("speed");
+  const i18n = window.AIRBridgeI18n;
+  const t = i18n.t;
   let busy = false;
+  let currentStatus = { key: "status_ready", args: {}, prefix: "" };
+  let currentSpeed = null;
+
+  function setStatus(key, args = {}, prefix = "") {
+    currentStatus = { key, args, prefix };
+    status.textContent = prefix + t(key, args);
+  }
+
+  function setSpeed(key, args = {}) {
+    currentSpeed = { key, args };
+    speed.textContent = t(key, args);
+  }
+
+  function error(key, values = {}) {
+    const problem = new Error(key);
+    problem.translationKey = key;
+    problem.values = values;
+    return problem;
+  }
+
+  document.querySelectorAll("[data-lang]").forEach(button => {
+    button.addEventListener("click", () => {
+      i18n.setLanguage(button.dataset.lang);
+      selection();
+      setStatus(currentStatus.key, currentStatus.args, currentStatus.prefix);
+      if (currentSpeed) setSpeed(currentSpeed.key, currentSpeed.args);
+      send.textContent = t(busy ? "sending" : "send_button");
+    });
+  });
 
   const fmt = n => {
     const units = ["B", "KB", "MB", "GB", "TB", "PB"];
@@ -31,10 +62,11 @@
   function selection() {
     const files = Array.from(input.files);
     selected.hidden = files.length === 0;
-    selected.textContent = files.length
-      ? files.length + " fail • " + fmt(files.reduce((sum, f) => sum + f.size, 0)) +
-        " • " + files.slice(0, 5).map(f => f.name).join(", ")
-      : "";
+    selected.textContent = files.length ? t("selection", {
+      count: files.length,
+      size: fmt(files.reduce((sum, f) => sum + f.size, 0)),
+      names: files.slice(0, 5).map(f => f.name).join(", ")
+    }) : "";
     send.disabled = busy || files.length === 0;
   }
   input.addEventListener("change", selection);
@@ -46,7 +78,7 @@
       headers: { "X-Drop-Token": token, ...(options.headers || {}) }
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.error || "HTTP " + response.status);
+    if (!response.ok) throw error("server_error", { code: response.status });
     return body;
   }
 
@@ -64,10 +96,10 @@
         let body = {};
         try { body = JSON.parse(req.responseText); } catch (_) {}
         if (req.status === 200) resolve(body);
-        else reject(new Error(body.error || "Muat naik gagal"));
+        else reject(error("server_error", { code: req.status }));
       };
-      req.onerror = () => reject(new Error("Sambungan terputus. Semak Wi-Fi dan rangkaian."));
-      req.ontimeout = () => reject(new Error("Muat naik tamat masa."));
+      req.onerror = () => reject(error("connection_lost"));
+      req.ontimeout = () => reject(error("upload_timeout"));
       req.send(part);
     });
   }
@@ -86,7 +118,7 @@
             report(index, offset + bytes);
           });
           if (answer.next_offset !== end && !(answer.done && end === file.size)) {
-            throw new Error("Pengesahan fail tidak sepadan.");
+            throw error("chunk_mismatch");
           }
           delivered = true;
           break;
@@ -108,7 +140,7 @@
           await sleep(800 * (attempt + 1));
         }
       }
-      if (!delivered) throw new Error("Ketulan fail tidak dapat dihantar.");
+      if (!delivered) throw error("chunk_failed");
       offset = end;
       report(index, offset);
       if (file.size === 0) break;
@@ -123,13 +155,14 @@
     busy = true;
     selection();
     status.classList.remove("is-success", "is-error");
-    send.textContent = "Sedang diproses…";
+    send.textContent = t("sending");
+    currentSpeed = null;
     speed.textContent = "";
     progress.hidden = true;
     bar.style.width = "0%";
 
     try {
-      status.textContent = "Menunggu kelulusan pada Windows…";
+      setStatus("waiting");
       const offer = await api("/api/offer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -142,8 +175,8 @@
         if (approval.state !== "pending") break;
       }
       if (!approval || approval.state !== "accepted") {
-        throw new Error(approval && approval.state === "declined"
-          ? "PC menolak permintaan." : "Permintaan tamat masa atau tidak diluluskan.");
+        throw error(approval && approval.state === "declined"
+          ? "approval_declined" : "approval_expired");
       }
 
       progress.hidden = false;
@@ -173,9 +206,11 @@
         const percent = total ? Math.min(100, transferred / total * 100)
           : (finished / files.length * 100);
         bar.style.width = percent.toFixed(1) + "%";
-        status.textContent = "Menghantar " + finished + "/" + files.length +
-          " fail selesai • " + fmt(transferred) + " / " + fmt(total);
-        speed.textContent = "Kelajuan semasa: " + fmt(rate) + "/s";
+        setStatus("progress_status", {
+          count: finished, totalFiles: files.length,
+          sent: fmt(transferred), totalSize: fmt(total)
+        });
+        setSpeed("live_speed", { rate: fmt(rate) });
       }
 
       function report(index, bytes) {
@@ -209,17 +244,17 @@
       if (error) throw error.reason;
 
       const duration = Math.max(0.001, (performance.now() - started) / 1000);
-      status.textContent = "✓ Berjaya! " + files.length + " fail diterima (" + fmt(total) + ").";
+      setStatus("success", { count: files.length, size: fmt(total) });
       status.classList.add("is-success");
-      speed.textContent = "Kelajuan purata: " + fmt(total / duration) + "/s";
+      setSpeed("average_speed", { rate: fmt(total / duration) });
       bar.style.width = "100%";
       input.value = "";
     } catch (err) {
       status.classList.add("is-error");
-      status.textContent = "⚠ " + err.message;
+      setStatus(err.translationKey || "upload_failed", err.values || {}, "⚠ ");
     } finally {
       busy = false;
-      send.textContent = "Hantar ke Windows →";
+      send.textContent = t("send_button");
       selection();
     }
   });

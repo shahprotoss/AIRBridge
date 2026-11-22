@@ -18,6 +18,11 @@ button, input { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 .page { width: min(100%, 560px); margin: 0 auto; padding: 30px 22px 37px; }
 .topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.topbar { flex-wrap: wrap; }
+.language-switch { display:flex; padding:4px; gap:2px; border-radius:13px; background:#e9edf4; align-items:center; margin-left:auto; }
+.language-switch button { border:0; border-radius:10px; background:transparent; color:#6e7887; font-weight:650; font-size:11px; padding:8px 11px; cursor:pointer; }
+.language-switch button.active { background:#fff; color:#007aff; box-shadow:0 2px 8px #44647b20; }
+.language-switch button:focus-visible { outline:2px solid #007aff; outline-offset:2px; }
 .identity { display: flex; align-items: center; gap: 10px; font-weight: 750; font-size: 22px; letter-spacing: -.7px; }
 .logo {
   width: 43px; height: 43px; flex: none;
@@ -44,6 +49,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .eyebrow { color: #007aff; font-size: 11px; letter-spacing: 2.3px; font-weight: 800; }
 h1 { font-size: clamp(42px, 10vw, 57px); font-weight: 760; letter-spacing: -2.8px; line-height: 1.03; margin: 15px 0 14px; }
 h1 span { color: #007aff; }
+h1 .hero-first { color:#1d1d1f; }
 .hero p { color: #797c85; max-width: 400px; margin: 0 auto; font-size: 14px; line-height: 1.75; }
 .transfer-card {
   background: #fff;
@@ -105,6 +111,7 @@ footer span { padding: 0 6px; }
   .page { padding: 22px 15px 29px; }
   .connected { font-size: 10px; padding: 8px 9px; }
   .identity { font-size: 18px; }
+  .language-switch { order:3; margin-top:9px; }
   .logo { width: 39px; height: 39px; }
   .hero { padding: 37px 0 22px; }
   .hero-icon { width: 117px; height: 117px; border-radius: 32px; }

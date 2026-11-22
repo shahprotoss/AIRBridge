@@ -1,4 +1,4 @@
-AIRBridge v1.3 — PANDUAN RINGKAS (iPhone ke Windows)
+AIRBridge v1.4 — PANDUAN RINGKAS (iPhone ke Windows)
 ====================================================
 
 AIRBridge ialah aplikasi Windows untuk menerima foto, video dan dokumen
@@ -16,11 +16,19 @@ CARA PASANG / MULA
    - PC: Wi-Fi atau kabel LAN pada penghala/rangkaian yang sama.
 6. Buka Camera pada iPhone, imbas kod QR dalam AIRBridge, dan ketik pautan
    untuk membuka halaman AIRBridge di Safari.
-7. Pilih gambar, video atau dokumen lalu tekan "Hantar ke Windows".
-8. Pada aplikasi AIRBridge di Windows, tekan "Accept".
-9. Tunggu pemindahan selesai. Aplikasi akan memaparkan notifikasi kejayaan.
-10. Klik "Open received files" untuk membuka folder fail yang diterima.
-    Untuk mengubah folder simpanan, gunakan butang "Change".
+7. Pilih bahasa "English" atau "Bahasa Melayu" pada halaman iPhone.
+8. Pilih gambar, video atau dokumen lalu tekan "Hantar ke Windows"
+   (Bahasa Melayu) atau "Send to Windows" (English).
+9. Pada AIRBridge di Windows, tekan "Terima" atau "Accept".
+10. Tunggu pemindahan selesai. Aplikasi memaparkan notifikasi kejayaan.
+11. Klik "Buka fail diterima" / "Open received files" untuk membuka folder.
+    Gunakan butang "Tukar" / "Change" untuk memilih folder lain.
+
+BAHASA / LANGUAGE
+-----------------
+Pada aplikasi Windows, pilih "English" atau "Bahasa Melayu" di bahagian atas.
+Pada Safari iPhone, pilih bahasa di bahagian atas halaman penghantaran.
+Setiap peranti menyimpan pilihannya untuk kegunaan seterusnya.
 
 KANDUNGAN FOLDER
 ----------------

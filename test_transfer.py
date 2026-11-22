@@ -38,6 +38,14 @@ class DropServerTests(unittest.TestCase):
         self.assertEqual(code, 403)
         code, _ = self.request("GET", "/?k=" + self.server.token)
         self.assertEqual(code, 200)
+        code, sender_script = self.request("GET", "/i18n.js")
+        self.assertEqual(code, 200)
+        self.assertIn(b"Connected locally", sender_script)
+
+    def test_qr_language_hint(self):
+        self.assertIn("&lang=ms", self.server.url("ms"))
+        self.assertIn("&lang=en", self.server.url("en"))
+        self.assertNotIn("&lang=", self.server.url("invalid"))
 
     def test_approval_and_file_upload(self):
         code, offer = self.request("POST", "/api/offer", {"files": [{"name": "../../photo.txt", "size": 5}]})

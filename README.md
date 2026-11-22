@@ -2,7 +2,7 @@
 
 **Muat turun dari [GitHub Releases](../../releases/latest)** apabila release
 diterbitkan. Untuk pengguna biasa, pilih fail
-**AIRBridge-v1.3-Pakej-Lengkap.zip**, ekstrak dan klik **AIRBridge.exe**.
+**AIRBridge-v1.4-Pakej-Lengkap.zip**, ekstrak dan klik **AIRBridge.exe**.
 Python tidak diperlukan pada komputer pengguna.
 
 ![Infografik 7 langkah AIRBridge](INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png)
@@ -11,10 +11,16 @@ Python tidak diperlukan pada komputer pengguna.
 
 1. Sambungkan iPhone dan Windows pada rangkaian setempat yang sama.
 2. Buka **AIRBridge.exe** pada Windows 11.
+   Pilih **English** atau **Bahasa Melayu** pada bahagian atas aplikasi.
 3. Imbas kod QR AIRBridge menggunakan Camera iPhone, kemudian buka Safari.
-4. Pilih foto, video atau dokumen dan ketik **Hantar ke Windows**.
-5. Klik **Accept** pada aplikasi AIRBridge di Windows.
-6. Tunggu sehingga selesai, kemudian buka folder melalui **Open received files**.
+4. Pilih bahasa pada Safari, kemudian pilih foto, video atau dokumen
+   dan ketik **Hantar ke Windows**.
+5. Klik **Terima** pada aplikasi AIRBridge di Windows.
+6. Tunggu sehingga selesai, kemudian buka folder melalui **Buka fail diterima**.
+
+**Pilihan bahasa diingati:** tetapan Windows disimpan pada PC dan pilihan
+Safari disimpan pada iPhone. Apabila menggunakan QR buat kali pertama,
+Safari mengikut pilihan bahasa Windows melainkan iPhone sudah memilih sendiri.
 
 Panduan bergambar boleh dibuka dalam
 [PANDUAN-INFOGRAFIK.html](PANDUAN-INFOGRAFIK.html).
@@ -22,6 +28,21 @@ Panduan bergambar boleh dibuka dalam
 > **Penting:** AIRBridge bukan AirDrop rasmi Apple. Pemindahan HTTP setempat
 > tidak disulitkan; gunakan hanya rangkaian peribadi yang dipercayai.
 > Fail tidak dihantar ke cloud.
+
+---
+
+# English instructions
+
+1. Connect your iPhone and Windows PC to the same private local network.
+2. Open **AIRBridge.exe** and select **English** or **Bahasa Melayu**.
+3. Scan the QR with iPhone Camera and open the page in Safari.
+4. Select your preferred language on Safari, choose files, then tap **Send to Windows**.
+5. Click **Accept** on Windows; wait for the transfer-complete notification.
+6. Use **Open received files** to open the destination or **Change** to select
+   another folder.
+
+Language preferences are saved separately on Windows and Safari. The iPhone
+page uses the Windows language as its initial setting unless already customized.
 
 ---
 
@@ -42,8 +63,8 @@ For a new executable, run `build.bat` (Python 3.13 required).
    Windows Defender Firewall prompts for permission.
 3. Scan the QR code with the iPhone camera. Safari opens the secure-by-token
    local file transfer page.
-4. Select files and press **Hantar ke Windows**.
-5. Press **Terima** on the Windows application and wait until transfer completes.
+4. Select files and press **Send to Windows**.
+5. Press **Accept** on the Windows application and wait until transfer completes.
 6. Files save to `Downloads\AIRBridge` by default (configurable); existing
    DropBridge settings and the previous received-files directory are preserved
    automatically, so existing files are not moved or deleted.
@@ -51,6 +72,8 @@ For a new executable, run `build.bat` (Python 3.13 required).
 ## Premium UI and notifications
 
 - Light macOS-inspired interface, custom AIRBridge icon and modern rounded cards.
+- English and Bahasa Melayu language switches on Windows and Safari, with
+  saved preferences, localized transfer statuses and completion notifications.
 - Matching iPhone transfer web page in a clean white-and-blue style.
 - Receives up to three files concurrently using 16 MiB chunks.
 - Shows a floating AIRBridge success popup when an entire batch is received.

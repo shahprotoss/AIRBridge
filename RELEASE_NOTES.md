@@ -1,17 +1,22 @@
-# AIRBridge v1.3 — Windows release
+# AIRBridge v1.4 — Bilingual Windows release
 
 A lightweight iPhone-to-Windows local transfer utility with an Apple-inspired
 interface, QR pairing, transfer approval, and success notifications.
 
 ### Download
 
-- **AIRBridge-v1.3-Pakej-Lengkap.zip** — recommended. Contains the Windows
+- **AIRBridge-v1.4-Pakej-Lengkap.zip** — recommended. Contains the Windows
   executable, illustrated Malay-language usage guide, and optional source code.
 - **AIRBridge.exe** — standalone Windows application.
 - **INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png** — seven illustrated setup steps.
 
 ### Highlights
 
+- **New: English / Bahasa Melayu** selection in the Windows app and iPhone
+  Safari page, with saved preferences. Transfer approval, progress statuses,
+  success popups and Windows notifications use the selected language.
+- **Baharu: Pilih English / Bahasa Melayu** di Windows dan Safari iPhone.
+  Pilihan disimpan untuk penggunaan seterusnya.
 - Modern rounded Windows interface and matching iPhone Safari sender page.
 - Displays an in-app completion popup and attempts a native Windows notification.
 - Files transfer in 16 MiB chunks; up to three different files in parallel.
