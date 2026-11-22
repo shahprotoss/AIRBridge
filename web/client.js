@@ -1,0 +1,226 @@
+(() => {
+  "use strict";
+
+  // Larger requests and a small number of concurrent files reduce round trips,
+  // without introducing a file-size or batch-size limit.
+  const CHUNK_BYTES = 16 * 1024 * 1024;
+  const CONCURRENT_FILES = 3;
+  const token = new URL(location.href).searchParams.get("k") || "";
+  history.replaceState({}, "", "/");
+
+  const input = document.getElementById("files");
+  const send = document.getElementById("send");
+  const selected = document.getElementById("selected");
+  const status = document.getElementById("status");
+  const progress = document.getElementById("progress");
+  const bar = document.getElementById("bar");
+  const speed = document.getElementById("speed");
+  let busy = false;
+
+  const fmt = n => {
+    const units = ["B", "KB", "MB", "GB", "TB", "PB"];
+    let i = 0;
+    while (n >= 1024 && i < units.length - 1) {
+      n /= 1024;
+      i++;
+    }
+    return (i === 0 ? n : n.toFixed(1)) + " " + units[i];
+  };
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+  function selection() {
+    const files = Array.from(input.files);
+    selected.hidden = files.length === 0;
+    selected.textContent = files.length
+      ? files.length + " fail • " + fmt(files.reduce((sum, f) => sum + f.size, 0)) +
+        " • " + files.slice(0, 5).map(f => f.name).join(", ")
+      : "";
+    send.disabled = busy || files.length === 0;
+  }
+  input.addEventListener("change", selection);
+
+  async function api(path, options = {}) {
+    const response = await fetch(path, {
+      cache: "no-store",
+      ...options,
+      headers: { "X-Drop-Token": token, ...(options.headers || {}) }
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(body.error || "HTTP " + response.status);
+    return body;
+  }
+
+  function uploadChunk(offerId, index, offset, part, onProgress) {
+    return new Promise((resolve, reject) => {
+      const req = new XMLHttpRequest();
+      req.open("POST", "/api/upload?id=" + encodeURIComponent(offerId) +
+        "&index=" + index + "&offset=" + offset);
+      req.setRequestHeader("X-Drop-Token", token);
+      req.timeout = 5 * 60 * 1000;
+      req.upload.onprogress = event => {
+        if (event.lengthComputable) onProgress(event.loaded);
+      };
+      req.onload = () => {
+        let body = {};
+        try { body = JSON.parse(req.responseText); } catch (_) {}
+        if (req.status === 200) resolve(body);
+        else reject(new Error(body.error || "Muat naik gagal"));
+      };
+      req.onerror = () => reject(new Error("Sambungan terputus. Semak Wi-Fi dan rangkaian."));
+      req.ontimeout = () => reject(new Error("Muat naik tamat masa."));
+      req.send(part);
+    });
+  }
+
+  async function uploadFile(offerId, index, file, report) {
+    let offset = 0;
+    // An empty file still needs one zero-byte request to create it on Windows.
+    while (offset < file.size || (file.size === 0 && offset === 0)) {
+      const end = Math.min(offset + CHUNK_BYTES, file.size);
+      const chunk = file.slice(offset, end);
+      let delivered = false;
+
+      for (let attempt = 0; attempt < 4; attempt++) {
+        try {
+          const answer = await uploadChunk(offerId, index, offset, chunk, bytes => {
+            report(index, offset + bytes);
+          });
+          if (answer.next_offset !== end && !(answer.done && end === file.size)) {
+            throw new Error("Pengesahan fail tidak sepadan.");
+          }
+          delivered = true;
+          break;
+        } catch (err) {
+          report(index, offset);
+          // A server may have written a chunk even when its reply was lost.
+          let state = null;
+          try {
+            state = await api("/api/status?id=" + encodeURIComponent(offerId) +
+              "&index=" + index);
+          } catch (_) {
+            // Temporary network problem; retry.
+          }
+          if (state && state.file_offset === end && (end > offset || state.file_done)) {
+            delivered = true;
+            break;
+          }
+          if ((state && state.file_offset !== offset) || attempt === 3) throw err;
+          await sleep(800 * (attempt + 1));
+        }
+      }
+      if (!delivered) throw new Error("Ketulan fail tidak dapat dihantar.");
+      offset = end;
+      report(index, offset);
+      if (file.size === 0) break;
+    }
+  }
+
+  send.addEventListener("click", async () => {
+    if (busy) return;
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    const total = files.reduce((sum, f) => sum + f.size, 0);
+    busy = true;
+    selection();
+    status.classList.remove("is-success", "is-error");
+    send.textContent = "Sedang diproses…";
+    speed.textContent = "";
+    progress.hidden = true;
+    bar.style.width = "0%";
+
+    try {
+      status.textContent = "Menunggu kelulusan pada Windows…";
+      const offer = await api("/api/offer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ files: files.map(f => ({ name: f.name, size: f.size })) })
+      });
+      let approval = null;
+      for (let attempt = 0; attempt < 150; attempt++) {
+        await sleep(2000);
+        approval = await api("/api/status?id=" + encodeURIComponent(offer.id));
+        if (approval.state !== "pending") break;
+      }
+      if (!approval || approval.state !== "accepted") {
+        throw new Error(approval && approval.state === "declined"
+          ? "PC menolak permintaan." : "Permintaan tamat masa atau tidak diluluskan.");
+      }
+
+      progress.hidden = false;
+      const active = new Map();
+      const started = performance.now();
+      let sampleTime = started;
+      let sampleBytes = 0;
+      let rate = 0;
+      let completedBytes = 0;
+      let finished = 0;
+      let nextIndex = 0;
+      let lastRender = 0;
+      let failed = false;
+
+      function render(force = false) {
+        const now = performance.now();
+        if (!force && now - lastRender < 140) return;
+        lastRender = now;
+        const transferred = completedBytes + Array.from(active.values())
+          .reduce((sum, bytes) => sum + bytes, 0);
+        const elapsed = now - sampleTime;
+        if (elapsed > 800) {
+          rate = Math.max(0, (transferred - sampleBytes) * 1000 / elapsed);
+          sampleBytes = transferred;
+          sampleTime = now;
+        }
+        const percent = total ? Math.min(100, transferred / total * 100)
+          : (finished / files.length * 100);
+        bar.style.width = percent.toFixed(1) + "%";
+        status.textContent = "Menghantar " + finished + "/" + files.length +
+          " fail selesai • " + fmt(transferred) + " / " + fmt(total);
+        speed.textContent = "Kelajuan semasa: " + fmt(rate) + "/s";
+      }
+
+      function report(index, bytes) {
+        active.set(index, bytes);
+        render();
+      }
+
+      async function worker() {
+        while (!failed) {
+          const index = nextIndex++;
+          if (index >= files.length) return;
+          active.set(index, 0);
+          try {
+            await uploadFile(offer.id, index, files[index], report);
+            active.delete(index);
+            completedBytes += files[index].size;
+            finished++;
+            render(true);
+          } catch (err) {
+            failed = true;
+            throw err;
+          }
+        }
+      }
+      const workers = Array.from(
+        { length: Math.min(CONCURRENT_FILES, files.length) },
+        () => worker()
+      );
+      const results = await Promise.allSettled(workers);
+      const error = results.find(r => r.status === "rejected");
+      if (error) throw error.reason;
+
+      const duration = Math.max(0.001, (performance.now() - started) / 1000);
+      status.textContent = "✓ Berjaya! " + files.length + " fail diterima (" + fmt(total) + ").";
+      status.classList.add("is-success");
+      speed.textContent = "Kelajuan purata: " + fmt(total / duration) + "/s";
+      bar.style.width = "100%";
+      input.value = "";
+    } catch (err) {
+      status.classList.add("is-error");
+      status.textContent = "⚠ " + err.message;
+    } finally {
+      busy = false;
+      send.textContent = "Hantar ke Windows →";
+      selection();
+    }
+  });
+})();

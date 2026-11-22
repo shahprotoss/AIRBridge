@@ -1,0 +1,5 @@
+Pillow>=11,<14
+qrcode>=8,<9
+pyinstaller>=6,<7
+customtkinter>=5.2,<7
+winotify>=1.1,<2

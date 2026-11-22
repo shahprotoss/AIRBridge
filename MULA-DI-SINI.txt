@@ -1,0 +1,51 @@
+AIRBridge v1.3 — PANDUAN RINGKAS (iPhone ke Windows)
+====================================================
+
+AIRBridge ialah aplikasi Windows untuk menerima foto, video dan dokumen
+daripada iPhone melalui Safari dan rangkaian setempat.
+Ini BUKAN penerima AirDrop rasmi Apple.
+
+CARA PASANG / MULA
+------------------
+1. Klik kanan fail ZIP -> Extract All.
+2. Buka folder AIRBridge yang diekstrak.
+3. Jalankan AIRBridge.exe.
+4. Jika Windows Firewall meminta kebenaran, pilih rangkaian PRIVATE sahaja.
+5. Sambungkan iPhone dan PC pada rangkaian yang sama.
+   - iPhone: Wi-Fi.
+   - PC: Wi-Fi atau kabel LAN pada penghala/rangkaian yang sama.
+6. Buka Camera pada iPhone, imbas kod QR dalam AIRBridge, dan ketik pautan
+   untuk membuka halaman AIRBridge di Safari.
+7. Pilih gambar, video atau dokumen lalu tekan "Hantar ke Windows".
+8. Pada aplikasi AIRBridge di Windows, tekan "Accept".
+9. Tunggu pemindahan selesai. Aplikasi akan memaparkan notifikasi kejayaan.
+10. Klik "Open received files" untuk membuka folder fail yang diterima.
+    Untuk mengubah folder simpanan, gunakan butang "Change".
+
+KANDUNGAN FOLDER
+----------------
+AIRBridge.exe                  Aplikasi utama Windows (tidak perlu Python)
+INFOGRAFIK-CARA-GUNA.png      Panduan bergambar 7 langkah
+PANDUAN-INFOGRAFIK.html       Panduan bergambar yang boleh dibuka di pelayar
+MULA-DI-SINI.txt              Panduan ringkas ini
+Kod-Sumber/                   Kod sumber, arahan binaan dan fail ujian (pilihan)
+
+NOTA PENTING
+------------
+- AIRBridge tidak menetapkan had bilangan atau saiz fail. Had sebenar
+  masih bergantung pada storan, iPhone, Safari, rangkaian dan sistem fail.
+- Pastikan Safari kekal aktif semasa menghantar fail bersaiz besar.
+- Tidak menggunakan cloud, tetapi trafik HTTP setempat BELUM disulitkan.
+  Gunakan hanya rangkaian peribadi yang dipercayai.
+- Jangan buka port AIRBridge ke Internet / port-forward dari router.
+- Jika kod QR tidak boleh dibuka, semak Firewall Windows, Wi-Fi, VPN,
+  rangkaian tetamu (guest Wi-Fi) atau pengasingan peranti (client isolation).
+- Notifikasi dalam aplikasi dipaparkan apabila selesai; notifikasi Windows
+  bergantung pada tetapan Focus Assist/Notifications.
+- Aplikasi belum ditandatangani secara digital. Semak sumber fail sebelum
+  membenarkan sebarang amaran keselamatan daripada Windows.
+- Folder fail diterima yang sedia ada tidak dipadam atau dipindahkan apabila
+  menaik taraf daripada DropBridge.
+
+Hak cipta / penafian:
+AIRBridge bukan produk Apple dan tidak bergabung dengan Apple.

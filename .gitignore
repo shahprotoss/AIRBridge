@@ -1,0 +1,22 @@
+# Local build output (GitHub Releases provides the downloadable binaries).
+/build/
+/dist/
+/.venv/
+/venv/
+/__pycache__/
+/*.spec
+*.py[cod]
+*.log
+
+# Generated packages and previews.
+/AIRBridge-v*-Pakej-Lengkap.zip
+/thumbnail-preview.jpg
+/*.exe
+
+# Personal settings.
+/.env
+/.env.*
+/settings.json
+/.DS_Store
+Thumbs.db
+desktop.ini
