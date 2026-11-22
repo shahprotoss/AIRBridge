@@ -12,7 +12,7 @@ EXE = BASE / "dist" / "AIRBridge.exe"
 INFOGRAPHIC = BASE / "INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png"
 GUIDE = BASE / "PANDUAN-INFOGRAFIK.html"
 START = BASE / "MULA-DI-SINI.txt"
-VERSION = "v1.4"
+VERSION = "v1.5"
 ZIP_NAME = f"AIRBridge-{VERSION}-Pakej-Lengkap.zip"
 SHARE_DIRS = [
     Path.home() / "Desktop",
@@ -31,6 +31,7 @@ SOURCES = (
     "test_ui.py",
     "test_i18n.js",
     "test_localization.py",
+    "create_visual_guides.py",
 )
 
 
@@ -43,7 +44,12 @@ def sha256(path: Path) -> str:
 
 
 def main() -> None:
-    for p in (EXE, INFOGRAPHIC, GUIDE, START):
+    for p in (
+        EXE, INFOGRAPHIC, GUIDE, START,
+        BASE / "AIRBridge-Guide-EN.png", BASE / "AIRBridge-Guide-BM.png",
+        BASE / "AIRBridge-Guide-EN.html", BASE / "AIRBridge-Guide-BM.html",
+        BASE / "GUIDE_EN.md", BASE / "GUIDE_BM.md",
+    ):
         if not p.is_file() or p.stat().st_size == 0:
             raise FileNotFoundError(f"Required package file is missing: {p}")
 
@@ -53,6 +59,12 @@ def main() -> None:
     entries: list[tuple[Path, str]] = [
         (EXE, "AIRBridge/AIRBridge.exe"),
         (INFOGRAPHIC, "AIRBridge/INFOGRAFIK-CARA-GUNA.png"),
+        (BASE / "AIRBridge-Guide-EN.png", "AIRBridge/AIRBridge-Guide-EN.png"),
+        (BASE / "AIRBridge-Guide-BM.png", "AIRBridge/AIRBridge-Guide-BM.png"),
+        (BASE / "AIRBridge-Guide-EN.html", "AIRBridge/AIRBridge-Guide-EN.html"),
+        (BASE / "AIRBridge-Guide-BM.html", "AIRBridge/AIRBridge-Guide-BM.html"),
+        (BASE / "GUIDE_EN.md", "AIRBridge/GUIDE_EN.md"),
+        (BASE / "GUIDE_BM.md", "AIRBridge/GUIDE_BM.md"),
         (GUIDE, "AIRBridge/PANDUAN-INFOGRAFIK.html"),
         (START, "AIRBridge/MULA-DI-SINI.txt"),
     ]

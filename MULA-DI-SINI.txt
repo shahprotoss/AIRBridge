@@ -1,4 +1,4 @@
-AIRBridge v1.4 — PANDUAN RINGKAS (iPhone ke Windows)
+AIRBridge v1.5 — PANDUAN RINGKAS (iPhone ke Windows)
 ====================================================
 
 AIRBridge ialah aplikasi Windows untuk menerima foto, video dan dokumen
@@ -33,7 +33,13 @@ Setiap peranti menyimpan pilihannya untuk kegunaan seterusnya.
 KANDUNGAN FOLDER
 ----------------
 AIRBridge.exe                  Aplikasi utama Windows (tidak perlu Python)
-INFOGRAFIK-CARA-GUNA.png      Panduan bergambar 7 langkah
+INFOGRAFIK-CARA-GUNA.png      Panduan bergambar 6 langkah
+AIRBridge-Guide-EN.png        English infographic (6 steps)
+AIRBridge-Guide-BM.png        Infografik Bahasa Melayu (6 langkah)
+AIRBridge-Guide-EN.html       English infographic — open in a browser
+AIRBridge-Guide-BM.html       Infografik BM — boleh dibuka dalam browser
+GUIDE_EN.md                   Step-by-step English user guide
+GUIDE_BM.md                   Panduan lengkap Bahasa Melayu
 PANDUAN-INFOGRAFIK.html       Panduan bergambar yang boleh dibuka di pelayar
 MULA-DI-SINI.txt              Panduan ringkas ini
 Kod-Sumber/                   Kod sumber, arahan binaan dan fail ujian (pilihan)

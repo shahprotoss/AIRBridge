@@ -123,7 +123,7 @@ class DropServer:
         receiver = self
 
         class Handler(BaseHTTPRequestHandler):
-            server_version = "AIRBridge/1.4"
+            server_version = "AIRBridge/1.5"
             protocol_version = "HTTP/1.1"
 
             def log_message(self, *_args):

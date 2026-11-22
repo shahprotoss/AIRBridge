@@ -2,10 +2,29 @@
 
 **Muat turun dari [GitHub Releases](../../releases/latest)** apabila release
 diterbitkan. Untuk pengguna biasa, pilih fail
-**AIRBridge-v1.4-Pakej-Lengkap.zip**, ekstrak dan klik **AIRBridge.exe**.
+**AIRBridge-v1.5-Pakej-Lengkap.zip**, ekstrak dan klik **AIRBridge.exe**.
 Python tidak diperlukan pada komputer pengguna.
 
-![Infografik 7 langkah AIRBridge](INFOGRAFIK-CARA-GUNA-AIRBRIDGE.png)
+## English — How to use AIRBridge
+
+![AIRBridge English quick-start infographic](AIRBridge-Guide-EN.png)
+
+1. Download the latest **AIRBridge ZIP** or standalone `AIRBridge.exe` from
+   [GitHub Releases](../../releases/latest).
+2. Extract the ZIP (if downloaded) and open **AIRBridge.exe** on Windows 11.
+3. Connect your iPhone and PC to the **same trusted local network** (Ethernet
+   is fine for the PC). Allow Windows Firewall on **Private networks only**.
+4. Scan the QR code in AIRBridge with your iPhone Camera, then open in Safari.
+5. Choose **English** or **Bahasa Melayu** on Windows or iPhone Safari.
+6. Tap **Choose files** and **Send to Windows**. Then click **Accept** on the PC.
+7. Wait for the success notification; click **Open received files** to see them.
+
+Read the [full English user guide](GUIDE_EN.md) for troubleshooting, save
+locations, and security information.
+
+## Bahasa Melayu — Cara guna AIRBridge
+
+![Infografik Bahasa Melayu](AIRBridge-Guide-BM.png)
 
 ## Cara guna (Bahasa Melayu)
 
@@ -24,6 +43,8 @@ Safari mengikut pilihan bahasa Windows melainkan iPhone sudah memilih sendiri.
 
 Panduan bergambar boleh dibuka dalam
 [PANDUAN-INFOGRAFIK.html](PANDUAN-INFOGRAFIK.html).
+
+Rujuk juga [Panduan Bahasa Melayu](GUIDE_BM.md) untuk maklumat lanjut.
 
 > **Penting:** AIRBridge bukan AirDrop rasmi Apple. Pemindahan HTTP setempat
 > tidak disulitkan; gunakan hanya rangkaian peribadi yang dipercayai.
